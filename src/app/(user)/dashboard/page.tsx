@@ -1,6 +1,6 @@
 "use client"
 
-import { auth } from '../firebase';
+import { auth } from '../../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 import { useRouter } from 'next/navigation';
@@ -19,7 +19,7 @@ export default function Dashboard() {
 			<Typography sx={{mt: 2}} variant='h5'>Welcome, { user.displayName }</Typography>
 			<Image className='my-[1em] rounded' src={ user.photoURL ? user.photoURL : './logo.png' } alt='Profile Picture' width='100' height='100' />
 			<div className='grid grid-cols-2 m-[4em] gap-[2em]'>
-				<Button variant='outlined'>Create Auction</Button>
+				<Button onClick={() => {router.push('./newauction')}} variant='outlined'>Create Auction</Button>
 				<Button variant='outlined'>Browse Auctions</Button>
 				<Button variant='outlined'>Your Ongoing Auctions</Button>
 				<Button variant='outlined'>History</Button>
