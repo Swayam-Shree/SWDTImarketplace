@@ -2,11 +2,20 @@ import { Server } from 'socket.io';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
-	if (res.socket.server.io) {
-		console.log('Socket is already running');
-	} else {
-		console.log('Socket is initializing');
-		res.socket.server.io = new Server(res.socket.server);
+	// @ts-expect-error
+	if (!res.socket.server.io) {
+		// @ts-expect-error
+		const io = new Server(res.socket.server);
+		// @ts-expect-error
+		res.socket.server.io = io;
+
+		io.on('connection', (socket) => {
+			console.log('socket connected');
+
+			socket.on('disconnect', () => {
+				console.log('socket disconnected');
+			});
+		});
 	}
 	res.end();
 }
