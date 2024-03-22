@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
-let socket: Socket;
+export let socket: Socket;
 
 export default function SocketInit() {
 	async function socketInit() {
