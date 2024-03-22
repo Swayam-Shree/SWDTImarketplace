@@ -1,6 +1,8 @@
 import { Server } from 'socket.io';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { auctionsCollection } from '@/app/server/mongo';
+
 const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 	// @ts-expect-error
 	if (!res.socket.server.io) {
@@ -11,6 +13,10 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 
 		io.on('connection', (socket) => {
 			console.log('socket connected');
+
+			socket.on('createAuction', (data) => {
+				auctionsCollection.insertOne(data);
+			});
 
 			socket.on('disconnect', () => {
 				console.log('socket disconnected');

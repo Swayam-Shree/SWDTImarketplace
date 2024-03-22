@@ -10,7 +10,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
-import SocketInit from '../components/SocketInit';
+import SocketInit from './socket';
 
 const inter = Inter({ subsets: ["latin"] });
 
