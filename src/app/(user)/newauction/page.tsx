@@ -38,13 +38,11 @@ export default function NewAuction() {
 			console.log("creating auction on browser");
 
 			socket.emit('createAuction', {
-				ownerId: user?.uid,
-				initTime: Date.now(),
+				ownerId: user?.uid, 
 				itemName,
 				itemDescription,
 				basePrice: parseInt(basePrice),
 				duration: parseInt(duration) * 3600 * 1000, // converting hours to milliseconds
-				active: true
 			});
 
 			setItemName('');

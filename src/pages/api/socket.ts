@@ -14,9 +14,24 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 		io.on('connection', (socket) => {
 			console.log('socket connected');
 
-			socket.on('createAuction', (data) => {
-				auctionsCollection.insertOne(data);
+			socket.on('createAuction', (auction) => {
+				auction.initTime = Date.now();
+				auction.endTime = auction.initTime + auction.duration;
+				auction.active = true;
+				auction.currentBid = 0;
+
+				auctionsCollection.insertOne(auction);
 			});
+
+			socket.on('getAuctions', async (sendAuctions) => {
+				let auctions = await auctionsCollection.find().toArray();
+				sendAuctions(auctions);
+			});
+
+			// socket.on('getMyOngoingAuctions', async (sendAuctions) => {
+			// 	let auctions = await auctionsCollection.find({ active: true }).toArray();
+			// 	sendAuctions(auctions);
+			// });
 
 			socket.on('disconnect', () => {
 				console.log('socket disconnected');
