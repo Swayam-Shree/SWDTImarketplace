@@ -1,21 +1,10 @@
 import { Server } from 'socket.io';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { auctionsCollection } from '@/app/server/mongo';
+import { auctionsCollection, usersCollection } from '@/app/server/mongo';
 import { Auction } from '@/app/customTypes';
 
 const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
-
-	// TODO: use mongo queries to optimize this
-	function closeAuctions(auctions: Auction[]) {
-		for (let i = auctions.length - 1; i >= 0; --i) {
-			if (auctions[i].endTime < Date.now()) {
-				auctionsCollection.updateOne({ _id: auctions[i]._id }, { $set: { active: false } });
-				auctions.splice(i, 1);
-			}
-		}
-	}
-
 	// @ts-expect-error
 	if (!res.socket.server.io) {
 		// @ts-expect-error
@@ -26,6 +15,22 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 		io.on('connection', (socket) => {
 			console.log('socket connected');
 
+			socket.on('getUserData', async (uid, sendUserData) => {
+				let userData =  await usersCollection.findOne({ ownerId: uid });
+				if (userData) {
+					sendUserData(userData);
+				} else {
+					let user = {
+						ownerId: uid,
+						balance: 10000,
+						ongoingAuctions: [],
+						completedAuctions: []
+					};
+					usersCollection.insertOne(user);
+					sendUserData(user);
+				}
+			});
+
 			socket.on('createAuction', (auction) => {
 				auction.initTime = Date.now();
 				auction.endTime = auction.initTime + auction.duration;
@@ -35,25 +40,26 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 				auctionsCollection.insertOne(auction);
 			});
 
+			// TODO: stream or send data incrementally and apply projections
 			socket.on('getAuctions', async (sendAuctions) => {
-				let auctions = await auctionsCollection.find({ active: true }, {
-					sort: { endTime: 1 }
-				}).toArray();
+				await auctionsCollection.updateMany({ endTime: { $lt: Date.now() } }, { $set: { active: false } });
 
-				closeAuctions(auctions as Auction[]);
+				const cursor = auctionsCollection.find({ active: true }, { sort: { endTime: 1 } });
 
-				sendAuctions(auctions);
+				sendAuctions(await cursor.toArray());
+
+				await cursor.close();
 			});
 
+			// TODO: stream or send data incrementally and apply projections
 			socket.on('getMyOngoingAuctions', async (uid, sendAuctions) => {
-				console.log("sending ongoing auctions");
-				let auctions = await auctionsCollection.find({ ownerId: uid, active: true }, {
-					sort: { endTime: 1 }
-				}).toArray();
+				await auctionsCollection.updateMany({ endTime: { $lt: Date.now() } }, { $set: { active: false } });
 
-				closeAuctions(auctions as Auction[]);
+				let cursor = auctionsCollection.find({ ownerId: uid, active: true }, { sort: { endTime: 1 } });
 
-				sendAuctions(auctions);
+				sendAuctions(await cursor.toArray());
+
+				await cursor.close();
 			});
 
 			socket.on('disconnect', () => {

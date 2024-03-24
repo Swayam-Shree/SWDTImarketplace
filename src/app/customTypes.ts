@@ -12,3 +12,11 @@ export interface Auction {
 	active: boolean,
 	currentBid: number
 }
+
+export interface User {
+	_id: ObjectId,
+	ownerId: string,
+	balance: number,
+	ongoingAuctions: Auction[],
+	completedAuctions: Auction[]
+}

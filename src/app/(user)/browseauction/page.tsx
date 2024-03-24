@@ -27,7 +27,6 @@ export default function BrowseAuction() {
 			socket.emit('getAuctions', (data: Auction[]) => {
 				setAuctionsLoading(false);
 				setAuctions(data);
-				console.log(data);
 			});
 		} catch (e) {
 			router.push('/dashboard');
