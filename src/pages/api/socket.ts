@@ -2,8 +2,20 @@ import { Server } from 'socket.io';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { auctionsCollection } from '@/app/server/mongo';
+import { Auction } from '@/app/customTypes';
 
 const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
+
+	// TODO: use mongo queries to optimize this
+	function closeAuctions(auctions: Auction[]) {
+		for (let i = auctions.length - 1; i >= 0; --i) {
+			if (auctions[i].endTime < Date.now()) {
+				auctionsCollection.updateOne({ _id: auctions[i]._id }, { $set: { active: false } });
+				auctions.splice(i, 1);
+			}
+		}
+	}
+
 	// @ts-expect-error
 	if (!res.socket.server.io) {
 		// @ts-expect-error
@@ -24,14 +36,25 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 			});
 
 			socket.on('getAuctions', async (sendAuctions) => {
-				let auctions = await auctionsCollection.find().toArray();
+				let auctions = await auctionsCollection.find({ active: true }, {
+					sort: { endTime: 1 }
+				}).toArray();
+
+				closeAuctions(auctions as Auction[]);
+
 				sendAuctions(auctions);
 			});
 
-			// socket.on('getMyOngoingAuctions', async (sendAuctions) => {
-			// 	let auctions = await auctionsCollection.find({ active: true }).toArray();
-			// 	sendAuctions(auctions);
-			// });
+			socket.on('getMyOngoingAuctions', async (uid, sendAuctions) => {
+				console.log("sending ongoing auctions");
+				let auctions = await auctionsCollection.find({ ownerId: uid, active: true }, {
+					sort: { endTime: 1 }
+				}).toArray();
+
+				closeAuctions(auctions as Auction[]);
+
+				sendAuctions(auctions);
+			});
 
 			socket.on('disconnect', () => {
 				console.log('socket disconnected');
