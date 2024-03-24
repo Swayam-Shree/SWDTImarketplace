@@ -1,4 +1,7 @@
+import { ObjectId } from "mongodb"
+
 export interface Auction {
+	_id: ObjectId,
 	ownerId: string,
 	itemName: string,
 	itemDescription: string,

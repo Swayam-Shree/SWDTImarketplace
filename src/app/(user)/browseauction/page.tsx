@@ -27,6 +27,7 @@ export default function BrowseAuction() {
 			socket.emit('getAuctions', (data: Auction[]) => {
 				setAuctionsLoading(false);
 				setAuctions(data);
+				console.log(data);
 			});
 		} catch (e) {
 			router.push('/dashboard');
@@ -36,7 +37,7 @@ export default function BrowseAuction() {
 	let auctionsJsx;
 	if (!auctionsLoading) {
 		if (auctions.length === 0) {
-			auctionsJsx = <div>No ongoing auctions...</div>;
+			auctionsJsx = <div>No active auctions...</div>;
 		} else {
 			auctionsJsx = auctions.map((auction: Auction, index) => {
 				return (
