@@ -24,6 +24,10 @@ export default function({ auction }: { auction: Auction }) {
 		}
 	}, [timeRemaining]);
 
+	if (timeRemaining <= 0) {
+		return null;
+	}
+
 	let timeRemainingSeconds = Math.floor(timeRemaining / 1000);
 	let days = Math.floor(timeRemainingSeconds / 86400);
 	timeRemainingSeconds -= days * 86400;
