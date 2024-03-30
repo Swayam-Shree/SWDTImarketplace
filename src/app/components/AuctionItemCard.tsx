@@ -10,7 +10,8 @@ import { useState, useEffect } from 'react';
 
 import { socket } from '../socket';
 
-import { userGlobals } from '../(user)/layout';
+// import { userGlobals } from '../(user)/layout';
+import { userGlobals } from '../(user)/userGlobals';
 
 export default function({ auction }: { auction: Auction }) {
 	const [timeRemaining, setTimeRemaining] = useState(auction.endTime - Date.now());

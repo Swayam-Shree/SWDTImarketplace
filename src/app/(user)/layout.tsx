@@ -13,15 +13,13 @@ import { socket } from '../socket';
 
 import { User } from '@/app/customTypes';
 
-export let userGlobals = {
-	userData: {} as User
-};
+import { userGlobals } from './userGlobals';
 
 export default function Layout({
 	children,
-}: Readonly<{
+}: {
 	children: React.ReactNode;
-}>) {
+}) {
 	const router = useRouter();
 
 	// TODO: handle socket not connected on dashboard load more elegantly
@@ -35,7 +33,7 @@ export default function Layout({
 
 	useEffect(() => {
 		socket.on('updateUserData', (userData: User) => {
-			userGlobals.userData = userData;
+			userGlobals.userData = userData; 
 			setUserData(userData);
 		});
 

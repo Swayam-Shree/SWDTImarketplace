@@ -11,11 +11,6 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 		// @ts-expect-error
 		res.socket.server.io = io;
 
-		// function updateUserData(socket, uid) {
-		// 	let userData = await usersCollection.findOne({ ownerId: uid });
-		// 	socket.emit('userDataUpdate', userData);
-		// }
-
 		io.on('connection', (socket) => {
 			console.log('socket connected');
 
