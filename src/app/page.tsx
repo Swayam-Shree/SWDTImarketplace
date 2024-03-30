@@ -14,6 +14,10 @@ export default function Landing() {
 
 	if (user) {
 		router.push('/dashboard');
+	} else if (authLoading) {
+		return (<div>Loading...</div>);
+	} else if (authError) {
+		return (<div>Error</div>);
 	} else {
 		return (<div className='flex flex-col items-center'>
 			<Typography className='text-center' sx={{mt: 1}} variant='h2'>SWDTI marketplace</Typography>

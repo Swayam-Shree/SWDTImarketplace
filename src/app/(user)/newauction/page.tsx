@@ -67,11 +67,10 @@ export default function NewAuction() {
 	if (user) {
 		return (<div className='flex flex-col items-center m-[2em]'>
 			<Typography className='text-center' variant='h2'>Create Auction</Typography>
-			<Button sx={{m: 2}} variant='outlined' onClick={ () => router.push('/dashboard') }>Back to Dashboard</Button>
 
-			<TextField sx={{mt: 4}} label='Item Name' value={ itemName } onChange={(e) => {setItemName(e.target.value);}} inputProps={{ maxLength: 64 }} error={itemNameError} fullWidth variant='filled' />
-			<TextField sx={{mt: 2}} label='Item Description' value={ itemDescription } onChange={(e) => {setItemDescription(e.target.value);}} inputProps={{ maxLength: 500 }} error={itemDescriptionError} multiline fullWidth variant='filled' />
-			<TextField sx={{mt: 2}} label='Base Price' type='number' error={basePriceError} fullWidth variant='filled'
+			<TextField className='max-w-[768px]' sx={{mt: 6}} label='Item Name' value={ itemName } onChange={(e) => {setItemName(e.target.value);}} inputProps={{ maxLength: 64 }} error={itemNameError} fullWidth variant='filled' />
+			<TextField className='max-w-[768px]' sx={{mt: 4}} label='Item Description' value={ itemDescription } onChange={(e) => {setItemDescription(e.target.value);}} inputProps={{ maxLength: 500 }} error={itemDescriptionError} multiline fullWidth variant='filled' />
+			<TextField className='max-w-[768px]' sx={{mt: 4}} label='Base Price' type='number' error={basePriceError} fullWidth variant='filled'
 				value={ basePrice } onChange={(e) => {setBasePrice(e.target.value);}}
 				inputProps={{
 					maxLength: 8,
@@ -80,7 +79,7 @@ export default function NewAuction() {
 					startAdornment: <InputAdornment position='start'>₹</InputAdornment>,
 				}}
 			/>
-			<TextField sx={{mt: 2}} label="Duration" value={ duration } onChange={(e) => {setDuration(e.target.value);}} select defaultValue={durationDefaultVal} fullWidth variant='filled'>
+			<TextField className='max-w-[768px]' sx={{mt: 4}} label="Duration" value={ duration } onChange={(e) => {setDuration(e.target.value);}} select defaultValue={durationDefaultVal} fullWidth variant='filled'>
 				{
 					durationOptions.map((option) => (
 						<MenuItem key={option.value} value={option.value}>
@@ -90,7 +89,7 @@ export default function NewAuction() {
 				}
 			</TextField>
 
-			<Button sx={{mt: 4}} onClick={ handleCreateAuction } variant='contained'>Create Auction</Button>
+			<Button sx={{mt: 6}} onClick={ handleCreateAuction } variant='contained'>Create Auction</Button>
 		</div>);
 	} else if (authLoading) {
 		return (<div>Loading...</div>);

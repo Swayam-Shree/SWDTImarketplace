@@ -21,17 +21,37 @@ export default function BrowseAuction() {
 
 	const [auctionsLoading, setAuctionsLoading] = useState(true);
 	const [auctions, setAuctions] = useState([] as Auction[]);
+	const [updatedAuction, setUpdatedAuction] = useState({} as Auction);
 
 	useEffect(() => {
 		try{
-			socket.emit('getAuctions', (data: Auction[]) => {
+			socket.on('updateAuction', (auction: Auction) => {
+				setUpdatedAuction(auction);
+			});
+
+			socket.emit('getAuctions', (auctions: Auction[]) => {
 				setAuctionsLoading(false);
-				setAuctions(data);
+				setAuctions(auctions);
 			});
 		} catch (e) {
 			router.push('/dashboard');
 		}
+
+		return () => {
+			socket.off('updateAuction');
+		};
 	}, []);
+
+	if (updatedAuction._id) {
+		for (let i = 0; i < auctions.length; ++i) {
+			if (auctions[i]._id === updatedAuction._id) {
+				auctions[i] = updatedAuction;
+				setUpdatedAuction({} as Auction);
+				setAuctions(auctions);
+				break;
+			}
+		}
+	}
 
 	let auctionsJsx;
 	if (!auctionsLoading) {
@@ -53,8 +73,9 @@ export default function BrowseAuction() {
 	if (user) {
 		return (<div className='flex flex-col items-center m-[2em]'>
 			<Typography className='text-center' variant='h2'>Browse Auctions</Typography>
-			<Button sx={{m: 2}} variant='outlined' onClick={ () => router.push('/dashboard') }>Back to Dashboard</Button>
-			{ auctionsJsx }
+			<div className='grid md:grid-cols-2 lg:grid-cols-3'>
+				{ auctionsJsx }
+			</div>
 		</div>);
 	} else if (authLoading) {
 		return (<div>Loading...</div>);

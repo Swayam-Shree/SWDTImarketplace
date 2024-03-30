@@ -10,13 +10,19 @@ export interface Auction {
 	initTime: number,
 	endTime: number,
 	active: boolean,
-	currentBid: number
+	currentBid: number,
+	highestBidderId: string
 }
 
 export interface User {
 	_id: ObjectId,
 	ownerId: string,
 	balance: number,
+	lockedBalance: number,
 	ongoingAuctions: Auction[],
-	completedAuctions: Auction[]
+	completedAuctions: Auction[],
+	biddings: {
+		auctionId: ObjectId,
+		bidAmount: number
+	}[]
 }

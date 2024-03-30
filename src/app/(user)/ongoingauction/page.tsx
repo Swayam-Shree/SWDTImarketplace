@@ -54,8 +54,9 @@ export default function OngoingAuction() {
 	if (user) {
 		return (<div className='flex flex-col items-center'>
 			<Typography className='text-center' variant='h2'>Your Ongoing Auctions</Typography>
-			<Button sx={{m: 2}} variant='outlined' onClick={ () => router.push('/dashboard') }>Back to Dashboard</Button>
-			{ auctionsJsx }
+			<div className='grid md:grid-cols-2 lg:grid-cols-3'>
+				{ auctionsJsx }
+			</div>
 		</div>);
 	} else if (authLoading) {
 		return (<div>Loading...</div>);
