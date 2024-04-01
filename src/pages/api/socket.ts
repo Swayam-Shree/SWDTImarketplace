@@ -40,19 +40,40 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 					
 					if (auction?.currentBid === currentExpectedAmount) {
 						if (auction?.currentBid === 0 && bidAmount < auction?.basePrice) return;
-						if (user?.ownerId !== auction?.highestBidderId && user?.balance >= bidAmount) {
+						if (user?.ownerId !== auction?.highestBidderId) {
 							
 							let biddingData = await usersCollection.findOne({ ownerId: uid, "biddings.auctionId": auctionId });
-
+							
+							// TODO: combine the following if else block via an upsert
 							if (biddingData) { // user has bid on this auction before
-								await usersCollection.updateOne({ ownerId: uid, "biddings.auctionId": auctionId }, { $inc: { "biddings.$.bidAmount": bidAmount } });
-								await usersCollection.updateOne({ ownerId: uid }, { $inc: { balance: -bidAmount, lockedBalance: bidAmount } });
+								for (let bid of biddingData.biddings) {
+									if (bid.auctionId === auctionId) {
+										// total bid = total amount - already bid amount
+										let totalBidAmount = bidAmount + currentExpectedAmount - bid.bidAmount;
+										if (totalBidAmount <= user?.balance) {
+											await usersCollection.updateOne({ ownerId: uid, "biddings.auctionId": auctionId }, {
+												$inc: {
+													"biddings.$.bidAmount": totalBidAmount,
+													balance: -totalBidAmount,
+													lockedBalance: totalBidAmount
+												}
+											});
+										} else {
+											success(false, 1); // insufficient balance on bid (not first time bid on item
+											return;
+										}
+										break;
+									}
+								}
 							} else { // user is bidding on this auction for the first time
 								let totalBidAmount = bidAmount + auction?.currentBid;
+
 								if (totalBidAmount <= user?.balance) {
-									// @ts-expect-error
-									await usersCollection.updateOne({ ownerId: uid }, { $push: { biddings: { auctionId: auctionId, bidAmount: totalBidAmount } } });
-									await usersCollection.updateOne({ ownerId: uid }, { $inc: { balance: -totalBidAmount, lockedBalance: totalBidAmount } });
+									await usersCollection.updateOne({ ownerId: uid }, { 
+										// @ts-expect-error
+										$push: { biddings: { auctionId: auctionId, bidAmount: totalBidAmount } },
+										$inc: { balance: -totalBidAmount, lockedBalance: totalBidAmount }
+									});
 								} else {
 									success(false, 1); // insufficient balance on first time bid on item
 									return;
@@ -71,6 +92,7 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 						}
 					} else {
 						success(false, 0); // auction data changed during order from client and receive on server
+						return;
 					}
 				}, { readConcern: { level: 'local' }, writeConcern: { w: 'majority' } });
 			});

@@ -67,6 +67,7 @@ export default function({ auction }: { auction: Auction }) {
 			setBidValueError(false);
 			setBidValueHelperText('');
 			setBidValue(0);
+			
 			socket.emit('bid', userGlobals.userData?.ownerId, auction._id, bidValue, auction.currentBid, (success: Boolean, code: number) => {
 				if (success) {
 					setBidValueHelperText('Bid placed successfully');
