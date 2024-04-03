@@ -14,6 +14,8 @@ import Typography from '@mui/material/Typography';
 
 import AuctionItemBid from '@/app/components/AuctionItemBid';
 
+import { userGlobals } from '../userGlobals';
+
 export default function BrowseAuction() {
 	const router = useRouter();
 	const [user, authLoading, authError] = useAuthState(auth);
@@ -25,10 +27,12 @@ export default function BrowseAuction() {
 	useEffect(() => {
 		try{
 			socket.on('updateAuction', (auction: Auction) => {
-				setUpdatedAuction(auction);
+				if (userGlobals.userData.biddings.map(bidding => bidding.auctionId).indexOf(auction._id) !== -1) {
+					setUpdatedAuction(auction);
+				}
 			});
 
-			socket.emit('getAuctions', (auctions: Auction[]) => {
+			socket.emit('getBiddedOngoingAuctions', user?.uid, (auctions: Auction[]) => {
 				setAuctionsLoading(false);
 				setAuctions(auctions);
 			});

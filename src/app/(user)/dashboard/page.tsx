@@ -16,16 +16,20 @@ import { socket } from '@/app/socket';
 
 import type { Auction } from '@/app/customTypes';
 
+import { userGlobals } from '../userGlobals';
+
 export default function Dashboard() {
 	const router = useRouter();
 	const [user, authLoading, authError] = useAuthState(auth);
-	const [boughtAuctions, setBoughtAuctions] = useState([] as Auction[]);
-	const [soldAuctions, setSoldAuctions] = useState([] as Auction[]);
+	const [boughtAuctionCount, setBoughtAuctionCount] = useState(0);
+	const [soldAuctionCount, setSoldAuctionCount] = useState(0);
 
 	useEffect(() => {
 		socket.on('sendAuctionStats', (boughtAuctions, soldAuctions) => {
-			setBoughtAuctions(boughtAuctions);
-			setSoldAuctions(soldAuctions);
+			setBoughtAuctionCount(boughtAuctions.length);
+			setSoldAuctionCount(soldAuctions.length);
+			userGlobals.boughtAuctions = boughtAuctions;
+			userGlobals.soldAuctions = soldAuctions;
 		});
 
 		socket.emit('getAuctionStats', user?.uid);
@@ -44,12 +48,12 @@ export default function Dashboard() {
 			<div className='grid grid-cols-2 m-[2em] gap-[2em]'>
 				<Button onClick={() => {router.push('./newauction');}} variant='outlined'>Create Auction</Button>
 				<Button onClick={() => {router.push('./browseauction');}} variant='outlined'>Browse Auctions</Button>
-				<Button onClick={() => {router.push('./ongoingauction');}} variant='outlined'>Your Ongoing Auctions</Button>
-				<Button variant='outlined'>Settings</Button>
-				<Badge badgeContent={boughtAuctions.length} color='primary'>
+				<Button onClick={() => {router.push('./createdongoing');}} variant='outlined'>Created Ongoing Auctions</Button>
+				<Button onClick={() => {router.push('./biddedongoing')}} variant='outlined'>Bidded Ongoing Auctions</Button>
+				<Badge badgeContent={boughtAuctionCount} color='primary'>
 					<Button onClick={() => {router.push('./boughtauction');}} variant='outlined'>Bought Auctions</Button>
 				</Badge>
-				<Badge badgeContent={soldAuctions.length} color='primary'>
+				<Badge badgeContent={soldAuctionCount} color='primary'>
 					<Button onClick={() => {router.push('./soldauction');}} variant='outlined'>Sold Auctions</Button>
 				</Badge>
 			</div>

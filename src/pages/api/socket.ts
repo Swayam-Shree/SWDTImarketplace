@@ -173,10 +173,26 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 			});
 
 			// TODO: stream or send data incrementally and apply projections
-			socket.on('getMyOngoingAuctions', async (uid, sendAuctions) => {
+			socket.on('getCreatedOngoingAuctions', async (uid, sendAuctions) => {
 				await auctionsCollection.updateMany({ endTime: { $lt: Date.now() } }, { $set: { active: false } });
 
 				let cursor = auctionsCollection.find({ ownerId: uid, active: true }, { sort: { endTime: 1 } });
+
+				sendAuctions(await cursor.toArray());
+
+				await cursor.close();
+			});
+
+			// TODO: stream or send data incrementally and apply projections
+			socket.on('getBiddedOngoingAuctions', async (uid, sendAuctions) => {
+				let userData = await usersCollection.findOne({ ownerId: uid });
+
+				let auctionIds = userData?.biddings.map((bidding: {auctionId: ObjectId, bidAmount: number}) => getObjectId(String(bidding.auctionId)));
+				
+				let cursor = auctionsCollection.find({
+					_id: { $in: auctionIds }, // ids in keys of biddings
+					endTime: { $gt: Date.now() }
+				});
 
 				sendAuctions(await cursor.toArray());
 

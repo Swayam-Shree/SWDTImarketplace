@@ -15,7 +15,7 @@ import Typography from '@mui/material/Typography';
 
 import AuctionItemDisplay from '@/app/components/AuctionItemDisplay';
 
-export default function OngoingAuction() {
+export default function CreatedOngoing() {
 	const router = useRouter();
 	const [user, authLoading, authError] = useAuthState(auth);
 
@@ -24,7 +24,7 @@ export default function OngoingAuction() {
 
 	useEffect(() => {
 		try{
-			socket.emit('getMyOngoingAuctions', user?.uid, (data: Auction[]) => {
+			socket.emit('getCreatedOngoingAuctions', user?.uid, (data: Auction[]) => {
 				setAuctionsLoading(false);
 				setAuctions(data);
 			});
@@ -52,7 +52,7 @@ export default function OngoingAuction() {
 
 	if (user) {
 		return (<div className='flex flex-col items-center'>
-			<Typography className='text-center' variant='h2'>Your Ongoing Auctions</Typography>
+			<Typography className='text-center' variant='h2'>Created Ongoing Auctions</Typography>
 			<div className='grid md:grid-cols-2 lg:grid-cols-3'>
 				{ auctionsJsx }
 			</div>

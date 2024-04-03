@@ -45,7 +45,7 @@ export default function({ auction }: { auction: Auction }) {
 	if (mins > 0) timerString += `${mins} mins, `;
 	timerString += `${seconds} secs`;
 
-	function handleEnd() {
+	function handleClaim() {
 
 	}
 
@@ -62,6 +62,6 @@ export default function({ auction }: { auction: Auction }) {
 				<Typography variant='h6'>Time remaining:</Typography>
 				<Typography variant='subtitle1'>{ timerString }</Typography>
 			</div>
-		<Button sx={{mt: 4}} onClick={ handleEnd } variant='outlined'>End Auction</Button>
+		<Button sx={{mt: 4}} onClick={ handleClaim } variant='outlined'>End Auction</Button>
 	</div>);
 }
