@@ -61,7 +61,6 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 
 				let myFinishedAuctions = await auctionsCollection.find({ ownerId: uid, endTime: { $lt: Date.now() } }).toArray();
 
-				console.log(myFinishedAuctions);
 				let soldAuctions = [];
 				let unsoldAuctionsIds = [];
 				for (let auction of myFinishedAuctions) {

@@ -1,6 +1,7 @@
 import { MongoClient, ObjectId } from 'mongodb';
 import type { Db, Collection, ClientSession } from 'mongodb';
-const uri = MONGO_URI;
+
+const uri = process.env.MONGO_URI as string;
 
 const mongoClient = new MongoClient(uri);
 
