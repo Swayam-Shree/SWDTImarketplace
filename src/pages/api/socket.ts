@@ -36,8 +36,7 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 			socket.on('getAuctionStats', async (uid) => {
 				let userData = await usersCollection.findOne({ ownerId: uid });
 
-				// @ts-expect-error
-				let auctionIds = userData?.biddings.map((bidding: {auctionId: ObjectId, bidAmount: number}) => getObjectId(bidding.auctionId));
+				let auctionIds = userData?.biddings.map((bidding: {auctionId: ObjectId, bidAmount: number}) => getObjectId(String(bidding.auctionId)));
 				
 				let finishedAuctions = await auctionsCollection.find({
 					_id: { $in: auctionIds }, // ids in keys of biddings
@@ -52,8 +51,7 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 						wonAuctions.push(auction);
 					} else {
 						returnedAmount += userData?.biddings.find((bidding: {auctionId: ObjectId, bidAmount: number} ) => {
-							// @ts-expect-error
-							return bidding.auctionId === String(auction._id);
+							return String(bidding.auctionId) === String(auction._id);
 						}).bidAmount;
 						lostAuctions.push(auction);
 					}
