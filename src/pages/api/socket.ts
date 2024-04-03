@@ -144,6 +144,11 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 				auctionsCollection.insertOne(auction);
 			});
 
+			socket.on('endAuction', async (auctionId, success) => {
+				await auctionsCollection.updateOne({ _id: getObjectId(auctionId) }, { $set: { active: false, endTime: Date.now() } });
+				success();
+			});
+
 			// TODO: stream or send data incrementally and apply projections
 			socket.on('getAuctions', async (sendAuctions) => {
 				await auctionsCollection.updateMany({ endTime: { $lt: Date.now() } }, { $set: { active: false } });

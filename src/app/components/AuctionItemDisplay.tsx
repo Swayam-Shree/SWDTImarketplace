@@ -46,7 +46,9 @@ export default function({ auction }: { auction: Auction }) {
 	timerString += `${seconds} secs`;
 
 	function handleEnd() {
-
+		socket.emit('endAuction', auction._id, () => {
+			setTimeRemaining(0);
+		});
 	}
 
 	return (<div className='flex flex-col items-center border border-black rounded p-[1em] m-[1em] min-w-[300px]'>
