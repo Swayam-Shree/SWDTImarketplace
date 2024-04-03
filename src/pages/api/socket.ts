@@ -33,7 +33,7 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 				}
 			});
 
-			socket.on('getWonAuctions', async (uid) => {
+			socket.on('getAuctionStats', async (uid) => {
 				let userData = await usersCollection.findOne({ ownerId: uid });
 
 				// @ts-expect-error
@@ -59,7 +59,22 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 					}
 				}
 
-				socket.emit("wonAuctions", wonAuctions);
+				let myFinishedAuctions = await auctionsCollection.find({ ownerId: uid, endTime: { $lt: Date.now() } }).toArray();
+
+				console.log(myFinishedAuctions);
+				let soldAuctions = [];
+				let unsoldAuctionsIds = [];
+				for (let auction of myFinishedAuctions) {
+					if (auction.currentBid === 0) {
+						unsoldAuctionsIds.push(auction._id);
+					} else {
+						soldAuctions.push(auction);
+					}
+				}
+
+				auctionsCollection.deleteMany({ _id: { $in: unsoldAuctionsIds } });
+
+				socket.emit("sendAuctionStats", wonAuctions, soldAuctions);
 				
 				await usersCollection.updateOne({ ownerId: uid }, {
 					// @ts-expect-error

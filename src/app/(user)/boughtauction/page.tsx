@@ -8,13 +8,15 @@ import { useRouter } from 'next/navigation';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 
-export default function CompletedAuction() {
+import type { Auction } from '@/app/customTypes';
+
+export default function BoughtAuction({ auctions }: { auctions: Auction[] }) {
 	const router = useRouter();
 	const [user, authLoading, authError] = useAuthState(auth);
 
 	if (user) {
 		return (<div className='flex flex-col items-center'>
-			<Typography className='text-center' variant='h2'>Completed Auctions</Typography>
+			<Typography className='text-center' variant='h2'>Bought Auctions</Typography>
 			
 		</div>);
 	} else if (authLoading) {

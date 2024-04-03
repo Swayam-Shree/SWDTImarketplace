@@ -19,17 +19,19 @@ import type { Auction } from '@/app/customTypes';
 export default function Dashboard() {
 	const router = useRouter();
 	const [user, authLoading, authError] = useAuthState(auth);
-	const [wonAuctions, setWonAuctions] = useState([] as Auction[]);
+	const [boughtAuctions, setBoughtAuctions] = useState([] as Auction[]);
+	const [soldAuctions, setSoldAuctions] = useState([] as Auction[]);
 
 	useEffect(() => {
-		socket.on('wonAuctions', (wonAuctions) => {
-			setWonAuctions(wonAuctions);
+		socket.on('sendAuctionStats', (boughtAuctions, soldAuctions) => {
+			setBoughtAuctions(boughtAuctions);
+			setSoldAuctions(soldAuctions);
 		});
 
-		socket.emit('getWonAuctions', user?.uid);
+		socket.emit('getAuctionStats', user?.uid);
 
 		return () => {
-			socket.off('wonAuctions');
+			socket.off('getAuctionStats');
 		};
 	}, []);
 
@@ -43,11 +45,13 @@ export default function Dashboard() {
 				<Button onClick={() => {router.push('./newauction');}} variant='outlined'>Create Auction</Button>
 				<Button onClick={() => {router.push('./browseauction');}} variant='outlined'>Browse Auctions</Button>
 				<Button onClick={() => {router.push('./ongoingauction');}} variant='outlined'>Your Ongoing Auctions</Button>
-				<Badge badgeContent={wonAuctions.length} color='primary'>
-					<Button onClick={() => {router.push('./completedauction');}} variant='outlined'>Completed Auctions</Button>
-				</Badge>
-				<Button variant='outlined'>Stuff</Button>
 				<Button variant='outlined'>Settings</Button>
+				<Badge badgeContent={boughtAuctions.length} color='primary'>
+					<Button onClick={() => {router.push('./boughtauction');}} variant='outlined'>Bought Auctions</Button>
+				</Badge>
+				<Badge badgeContent={soldAuctions.length} color='primary'>
+					<Button onClick={() => {router.push('./soldauction');}} variant='outlined'>Sold Auctions</Button>
+				</Badge>
 			</div>
 			<Button sx={{mt: 2}} variant='contained' onClick={ () => {auth.signOut();} }>Sign Out</Button>
 		</div>);
