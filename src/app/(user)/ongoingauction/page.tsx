@@ -12,9 +12,8 @@ import { socket } from '../../socket';
 import type { Auction } from '@/app/customTypes';
 
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 
-import AuctionItemCard from '@/app/components/AuctionItemCard';
+import AuctionItemDisplay from '@/app/components/AuctionItemDisplay';
 
 export default function OngoingAuction() {
 	const router = useRouter();
@@ -42,7 +41,7 @@ export default function OngoingAuction() {
 			auctionsJsx = auctions.map((auction: Auction, index) => {
 				return (
 					<div key={index}>
-						<AuctionItemCard auction={auction} />
+						<AuctionItemDisplay auction={auction} />
 					</div>
 				);
 			});

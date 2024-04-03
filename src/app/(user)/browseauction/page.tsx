@@ -13,7 +13,7 @@ import type { Auction } from '@/app/customTypes';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 
-import AuctionItemCard from '@/app/components/AuctionItemCard';
+import AuctionItemBid from '@/app/components/AuctionItemBid';
 
 export default function BrowseAuction() {
 	const router = useRouter();
@@ -61,7 +61,7 @@ export default function BrowseAuction() {
 			auctionsJsx = auctions.map((auction: Auction, index) => {
 				return (
 					<div key={index}>
-						<AuctionItemCard auction={auction} />
+						<AuctionItemBid auction={auction} />
 					</div>
 				);
 			});

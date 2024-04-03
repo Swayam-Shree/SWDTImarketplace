@@ -19,8 +19,6 @@ export interface User {
 	ownerId: string,
 	balance: number,
 	lockedBalance: number,
-	ongoingAuctions: Auction[],
-	completedAuctions: Auction[],
 	biddings: {
 		auctionId: ObjectId,
 		bidAmount: number

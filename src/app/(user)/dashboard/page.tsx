@@ -8,10 +8,30 @@ import Image from 'next/image';
 
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import Badge from '@mui/material/Badge';
+
+import { useEffect, useState } from 'react';
+
+import { socket } from '@/app/socket';
+
+import type { Auction } from '@/app/customTypes';
 
 export default function Dashboard() {
 	const router = useRouter();
 	const [user, authLoading, authError] = useAuthState(auth);
+	const [wonAuctions, setWonAuctions] = useState([] as Auction[]);
+
+	useEffect(() => {
+		socket.on('wonAuctions', (wonAuctions) => {
+			setWonAuctions(wonAuctions);
+		});
+
+		socket.emit('getWonAuctions', user?.uid);
+
+		return () => {
+			socket.off('wonAuctions');
+		};
+	}, []);
 
 	if (user) {
 		return (<div className='flex flex-col items-center'>
@@ -23,7 +43,9 @@ export default function Dashboard() {
 				<Button onClick={() => {router.push('./newauction');}} variant='outlined'>Create Auction</Button>
 				<Button onClick={() => {router.push('./browseauction');}} variant='outlined'>Browse Auctions</Button>
 				<Button onClick={() => {router.push('./ongoingauction');}} variant='outlined'>Your Ongoing Auctions</Button>
-				<Button onClick={() => {router.push('./completedauction');}} variant='outlined'>Completed Auctions</Button>
+				<Badge badgeContent={wonAuctions.length} color='primary'>
+					<Button onClick={() => {router.push('./completedauction');}} variant='outlined'>Completed Auctions</Button>
+				</Badge>
 				<Button variant='outlined'>Stuff</Button>
 				<Button variant='outlined'>Settings</Button>
 			</div>

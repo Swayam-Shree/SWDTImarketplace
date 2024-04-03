@@ -15,7 +15,7 @@ export default function CompletedAuction() {
 	if (user) {
 		return (<div className='flex flex-col items-center'>
 			<Typography className='text-center' variant='h2'>Completed Auctions</Typography>
-			<Button sx={{m: 2}} variant='outlined' onClick={ () => router.push('/dashboard') }>Back to Dashboard</Button>
+			
 		</div>);
 	} else if (authLoading) {
 		return (<div>Loading...</div>);

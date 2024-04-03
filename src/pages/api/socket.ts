@@ -3,6 +3,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { bidSession, auctionsCollection, usersCollection, getObjectId } from '@/app/server/mongo';
 
+import { ObjectId } from 'mongodb';
+
 const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 	// @ts-expect-error
 	if (!res.socket.server.io) {
@@ -24,13 +26,48 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 						ownerId: uid,
 						balance: 10000,
 						lockedBalance: 0,
-						ongoingAuctions: [],
-						completedAuctions: [],
 						biddings: []
 					};
 					usersCollection.insertOne(user);
 					socket.emit("updateUserData", user);
 				}
+			});
+
+			socket.on('getWonAuctions', async (uid) => {
+				let userData = await usersCollection.findOne({ ownerId: uid });
+
+				// @ts-expect-error
+				let auctionIds = userData?.biddings.map((bidding: {auctionId: ObjectId, bidAmount: number}) => getObjectId(bidding.auctionId));
+				
+				let finishedAuctions = await auctionsCollection.find({
+					_id: { $in: auctionIds }, // ids in keys of biddings
+					endTime: { $lt: Date.now() }
+				}).toArray();
+
+				let returnedAmount = 0;
+				let wonAuctions = [];
+				let lostAuctions = [];
+				for (let auction of finishedAuctions) {
+					if (auction.highestBidderId === uid) {
+						wonAuctions.push(auction);
+					} else {
+						returnedAmount += userData?.biddings.find((bidding: {auctionId: ObjectId, bidAmount: number} ) => {
+							// @ts-expect-error
+							return bidding.auctionId === String(auction._id);
+						}).bidAmount;
+						lostAuctions.push(auction);
+					}
+				}
+
+				socket.emit("wonAuctions", wonAuctions);
+				
+				await usersCollection.updateOne({ ownerId: uid }, {
+					// @ts-expect-error
+					$pull: { biddings: { auctionId: { $in: lostAuctions.map(auction => String(auction._id)) } } },
+					$inc: { balance: returnedAmount, lockedBalance: -returnedAmount }
+				});
+				
+				socket.emit('updateUserData', await usersCollection.findOne({ ownerId: uid }));
 			});
 
 			socket.on('bid', async (uid, auctionId, bidAmount, currentExpectedAmount, success) => {
@@ -59,7 +96,7 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 												}
 											});
 										} else {
-											success(false, 1); // insufficient balance on bid (not first time bid on item
+											success(false, 1); // insufficient balance on bid (not first time bid on item)
 											return;
 										}
 										break;

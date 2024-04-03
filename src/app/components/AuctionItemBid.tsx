@@ -10,7 +10,6 @@ import { useState, useEffect } from 'react';
 
 import { socket } from '../socket';
 
-// import { userGlobals } from '../(user)/layout';
 import { userGlobals } from '../(user)/userGlobals';
 
 export default function({ auction }: { auction: Auction }) {
@@ -67,7 +66,7 @@ export default function({ auction }: { auction: Auction }) {
 			setBidValueError(false);
 			setBidValueHelperText('');
 			setBidValue(0);
-			
+
 			socket.emit('bid', userGlobals.userData?.ownerId, auction._id, bidValue, auction.currentBid, (success: Boolean, code: number) => {
 				if (success) {
 					setBidValueHelperText('Bid placed successfully');
