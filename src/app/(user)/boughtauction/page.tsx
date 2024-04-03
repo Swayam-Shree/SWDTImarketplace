@@ -10,7 +10,7 @@ import Button from '@mui/material/Button';
 
 import type { Auction } from '@/app/customTypes';
 
-export default function BoughtAuction({ auctions }: { auctions: Auction[] }) {
+export default function BoughtAuction() {
 	const router = useRouter();
 	const [user, authLoading, authError] = useAuthState(auth);
 
