@@ -13,6 +13,7 @@ import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import InputAdornment from '@mui/material/InputAdornment';
 import Snackbar from '@mui/material/Snackbar';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 import { socket } from '../../socket';
 
@@ -100,6 +101,11 @@ export default function NewAuction() {
 					))
 				}
 			</TextField>
+
+			{/* <Button sx={{mt: 2}} component="label" variant="outlined" startIcon={<CloudUploadIcon />}>
+				Upload Primary Image
+					<input onChange={(e) => { console.log(e?.target?.files) }} type="file" hidden multiple />
+			</Button> */}
 
 			<Button sx={{mt: 6}} onClick={ handleCreateAuction } variant='contained'>Create Auction</Button>
 
