@@ -3,6 +3,7 @@ import type { Auction } from '@/app/customTypes';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
+import Snackbar from '@mui/material/Snackbar';
 
 import Image from 'next/image';
 import { useState } from 'react';
@@ -13,6 +14,9 @@ import { QrReader } from 'react-qr-reader';
 
 export default function({ auction }: { auction: Auction }) {
 	const [openModal, setOpenModal] = useState(false);
+	const [removeAuction, setRemoveAuction] = useState(false);
+	const [openSnackbar, setOpenSnackbar] = useState(false);
+	const [snackbarMessage, setSnackbarMessage] = useState("");
 
 	function handleClaim() {
 		setOpenModal(true);
@@ -23,12 +27,19 @@ export default function({ auction }: { auction: Auction }) {
 			setOpenModal(false);
 			socket.emit("scannedQr", auction._id, result.text, (success: boolean) => {
 				if (success) {
-					alert("Claimed successfully");
+					setRemoveAuction(true);
+					setOpenSnackbar(true);
+					setSnackbarMessage("Auction claimed successfully");
 				} else {
-					alert("Claim failed");
+					setOpenSnackbar(true);
+					setSnackbarMessage("Incorrect QR code scanned");
 				}
 			});
 		}
+	}
+
+	if (removeAuction) {
+		return null;
 	}
 
 	return (<div className='flex flex-col items-center border border-black rounded p-[1em] m-[1em] min-w-[300px]'>
@@ -47,5 +58,10 @@ export default function({ auction }: { auction: Auction }) {
 				<Button onClick={() => setOpenModal(false)} variant="contained">Close</Button>
 			</div>
 		</Modal>
+		<Snackbar
+			open={openSnackbar}
+			autoHideDuration={3000}
+			message={snackbarMessage}
+		/>
 	</div>);
 }

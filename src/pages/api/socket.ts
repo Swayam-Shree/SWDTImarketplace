@@ -229,6 +229,11 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 				let auction = await auctionsCollection.findOne({ _id: getObjectId(auctionId) });
 
 				if (auction?.qrToken === qrVal) {
+					await usersCollection.updateOne({ ownerId: auction?.ownerId }, { $inc: { balance: auction?.currentBid } });
+					await usersCollection.updateOne({ ownerId: auction?.highestBidderId }, { $inc: { lockedBalance: -auction?.currentBid } });
+
+					await auctionsCollection.deleteOne({ _id: getObjectId(auctionId) });
+
 					callback(true);
 				} else {
 					callback(false);
