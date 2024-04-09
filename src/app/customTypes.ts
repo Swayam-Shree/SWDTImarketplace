@@ -11,7 +11,8 @@ export interface Auction {
 	endTime: number,
 	active: boolean,
 	currentBid: number,
-	highestBidderId: string
+	highestBidderId: string,
+	qrToken: string
 }
 
 export interface User {

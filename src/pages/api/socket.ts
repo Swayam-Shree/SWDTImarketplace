@@ -152,7 +152,8 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 					auction.endTime = auction.initTime + auction.duration;
 					auction.active = true;
 					auction.currentBid = 0;
-					auction.highestBidderId = '';
+					auction.highestBidderId = "";
+					auction.qrToken = "";
 	
 					auctionsCollection.insertOne(auction);
 	
@@ -203,6 +204,35 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 				sendAuctions(await cursor.toArray());
 
 				await cursor.close();
+			});
+
+			socket.on("generateQr", async (auctionId, callback) => {
+				let auction = await auctionsCollection.findOne({ _id: getObjectId(auctionId) });
+
+				if (auction?.qrToken) {
+					callback(true, auction.qrToken);
+					return;
+				} else {
+					require('crypto').randomBytes(48, function(err: any, buffer: { toString: (arg0: string) => any; }) {
+						if (err) {
+							callback(false, "");
+						} else {
+							let token = buffer.toString('hex');
+							callback(true, token);
+							auctionsCollection.updateOne({ _id: getObjectId(auctionId) }, { $set: { qrToken: token } });
+						}
+					});
+				}
+			});
+
+			socket.on("scannedQr", async (auctionId, qrVal, callback) => {
+				let auction = await auctionsCollection.findOne({ _id: getObjectId(auctionId) });
+
+				if (auction?.qrToken === qrVal) {
+					callback(true);
+				} else {
+					callback(false);
+				}
 			});
 
 			socket.on('disconnect', () => {

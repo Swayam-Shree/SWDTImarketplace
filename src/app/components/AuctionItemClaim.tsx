@@ -2,15 +2,33 @@ import type { Auction } from '@/app/customTypes';
 
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import { socket } from '../socket';
 
-export default function({ auction }: { auction: Auction }) {
-	function handleClaim() {
+import { QrReader } from 'react-qr-reader';
 
+export default function({ auction }: { auction: Auction }) {
+	const [openModal, setOpenModal] = useState(false);
+
+	function handleClaim() {
+		setOpenModal(true);
+	}
+
+	function handleQrResult(result: any, error: any) {
+		if (result?.text) {
+			setOpenModal(false);
+			socket.emit("scannedQr", auction._id, result.text, (success: boolean) => {
+				if (success) {
+					alert("Claimed successfully");
+				} else {
+					alert("Claim failed");
+				}
+			});
+		}
 	}
 
 	return (<div className='flex flex-col items-center border border-black rounded p-[1em] m-[1em] min-w-[300px]'>
@@ -23,5 +41,11 @@ export default function({ auction }: { auction: Auction }) {
 			<Typography variant='subtitle1'>₹{auction.currentBid}</Typography>
 		</div>
 		<Button sx={{mt: 4}} onClick={ handleClaim } variant='outlined'>Scan seller QR</Button>
+		<Modal open={openModal} onClose={() => setOpenModal(false)}>
+			<div className="flex flex-col">
+				<QrReader onResult={handleQrResult} constraints={{}} />
+				<Button onClick={() => setOpenModal(false)} variant="contained">Close</Button>
+			</div>
+		</Modal>
 	</div>);
 }

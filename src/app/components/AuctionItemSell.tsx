@@ -7,18 +7,37 @@ import Image from 'next/image';
 
 import QRCode from "react-qr-code";
 
+import { useState } from 'react';
+
+import { socket } from '../socket';
+
 export default function({ auction }: { auction: Auction }) {
+	const [qrVal, setQrVal] = useState("");
+
+	function handleGenerate() {
+		socket.emit("generateQr", auction._id, (success: boolean, qrVal: string) => {
+			if (success) {
+				setQrVal(qrVal);
+			} else {
+				console.error("Failed to generate QR");
+			}
+		});
+	}
+
 	return (<div className='flex flex-col items-center border border-black rounded p-[1em] m-[1em] min-w-[300px]'>
 		<Image src='/logo.png' alt='Item Image' width='256' height='256' />
 		<Typography sx={{mt: 4}} variant='h3'>{auction.itemName}</Typography>
-		<div className='flex flex-col items-left my-[1em] min-w-[250px]'>
+		<div className='flex flex-col items-left mt-[1em] min-w-[250px]'>
 			<Typography variant='h6'>Description:</Typography>
 			<Typography variant='subtitle1'>{auction.itemDescription}</Typography>
 			<Typography variant='h6'>Sold at:</Typography>
 			<Typography variant='subtitle1'>₹{auction.currentBid}</Typography>
 		</div>
+		<Button sx={{my: 1}} onClick={ handleGenerate } variant="contained">Generate QR</Button>
 		<div>
-			<QRCode size={256} value={String(auction._id)} />
+			{
+				qrVal ? <QRCode size={256} value={qrVal} /> : null
+			}
 		</div>
 	</div>);
 }
