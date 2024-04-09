@@ -14,8 +14,6 @@ import { useEffect, useState } from 'react';
 
 import { socket } from '@/app/socket';
 
-import type { Auction } from '@/app/customTypes';
-
 import { userGlobals } from '../userGlobals';
 
 export default function Dashboard() {
