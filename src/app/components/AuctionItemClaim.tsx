@@ -54,7 +54,7 @@ export default function({ auction }: { auction: Auction }) {
 		<Button sx={{mt: 4}} onClick={ handleClaim } variant='outlined'>Scan seller QR</Button>
 		<Modal open={openModal} onClose={() => setOpenModal(false)}>
 			<div className="flex flex-col">
-				<QrReader onResult={handleQrResult} constraints={{}} />
+				<QrReader onResult={handleQrResult} constraints={{ facingMode: "environment" }} />
 				<Button onClick={() => setOpenModal(false)} variant="contained">Close</Button>
 			</div>
 		</Modal>
