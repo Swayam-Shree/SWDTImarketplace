@@ -12,6 +12,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import InputAdornment from '@mui/material/InputAdornment';
+import Snackbar from '@mui/material/Snackbar';
 
 import { socket } from '../../socket';
 
@@ -29,6 +30,9 @@ export default function NewAuction() {
 	const [itemDescriptionError, setItemDescriptionError] = useState(false);
 	const [basePriceError, setBasePriceError] = useState(false);
 
+	const [snackbarOpen, setSnackbarOpen] = useState(false);
+	const [snackbarMessage, setSnackbarMessage] = useState("");
+
 	function handleCreateAuction() {
 		setItemNameError(!itemName);
 		setItemDescriptionError(!itemDescription);
@@ -43,12 +47,20 @@ export default function NewAuction() {
 				itemDescription,
 				basePrice: parseInt(basePrice),
 				duration: parseInt(duration) * 3600 * 1000, // converting hours to milliseconds
-			});
+			}, (success: boolean) => {
+				if (success) {
+					setItemName('');
+					setItemDescription('');
+					setBasePrice('');
+					setDuration(durationDefaultVal);
 
-			setItemName('');
-			setItemDescription('');
-			setBasePrice('');
-			setDuration(durationDefaultVal);
+					setSnackbarOpen(true);
+					setSnackbarMessage("Auction created successfully.");
+				} else {
+					setSnackbarOpen(true);
+					setSnackbarMessage("Auction creation failed, please try again.");
+				}
+			});
 		}
 	}
 
@@ -90,6 +102,13 @@ export default function NewAuction() {
 			</TextField>
 
 			<Button sx={{mt: 6}} onClick={ handleCreateAuction } variant='contained'>Create Auction</Button>
+
+			<Snackbar
+				open={snackbarOpen}
+				autoHideDuration={3000}
+				onClose={() => {setSnackbarOpen(false);}}
+				message={snackbarMessage}
+			/>
 		</div>);
 	} else if (authLoading) {
 		return (<div>Loading...</div>);

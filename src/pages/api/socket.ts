@@ -146,14 +146,20 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 				}, { readConcern: { level: 'local' }, writeConcern: { w: 'majority' } });
 			});
 
-			socket.on('createAuction', (auction) => {
-				auction.initTime = Date.now();
-				auction.endTime = auction.initTime + auction.duration;
-				auction.active = true;
-				auction.currentBid = 0;
-				auction.highestBidderId = '';
-
-				auctionsCollection.insertOne(auction);
+			socket.on('createAuction', (auction, callback) => {
+				try {
+					auction.initTime = Date.now();
+					auction.endTime = auction.initTime + auction.duration;
+					auction.active = true;
+					auction.currentBid = 0;
+					auction.highestBidderId = '';
+	
+					auctionsCollection.insertOne(auction);
+	
+					callback(true);
+				} catch {
+					callback(false);
+				}
 			});
 
 			socket.on('endAuction', async (auctionId, success) => {
