@@ -234,6 +234,8 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 
 					await auctionsCollection.deleteOne({ _id: getObjectId(auctionId) });
 
+					socket.emit('updateUserData', await usersCollection.findOne({ ownerId: auction?.highestBidderId }));
+
 					callback(true);
 				} else {
 					callback(false);
