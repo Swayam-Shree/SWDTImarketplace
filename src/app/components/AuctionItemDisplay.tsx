@@ -3,6 +3,8 @@ import type { Auction } from '@/app/customTypes';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
+import Carousel from 'react-material-ui-carousel';
+
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
@@ -52,18 +54,25 @@ export default function({ auction }: { auction: Auction }) {
 	}
 
 	return (<div className='flex flex-col items-center border border-black rounded p-[1em] m-[1em] min-w-[300px]'>
-		<Image src='/logo.png' alt='Item Image' width='256' height='256' />
-			<Typography sx={{mt: 4}} variant='h3'>{auction.itemName}</Typography>
-			<div className='flex flex-col items-left mt-[1em] min-w-[250px]'>
-				<Typography variant='h6'>Description:</Typography>
-				<Typography variant='subtitle1'>{auction.itemDescription}</Typography>
-				<Typography variant='h6'>Base Price:</Typography>
-				<Typography variant='subtitle1'>₹{auction.basePrice}</Typography>
-				<Typography variant='h6'>Current Price:</Typography>
-				<Typography variant='subtitle1'>₹{auction.currentBid}</Typography>
-				<Typography variant='h6'>Time remaining:</Typography>
-				<Typography variant='subtitle1'>{ timerString }</Typography>
-			</div>
+		<Carousel className='min-w-[256px]'>
+			{
+				auction.imageURLs.map((url, index) => (
+					<Image key={index} src={url} alt='Item Image' width='256' height='256' />
+				))
+			}
+		</Carousel>
+
+		<Typography sx={{mt: 4}} variant='h3'>{auction.itemName}</Typography>
+		<div className='flex flex-col items-left mt-[1em] min-w-[250px]'>
+			<Typography variant='h6'>Description:</Typography>
+			<Typography variant='subtitle1'>{auction.itemDescription}</Typography>
+			<Typography variant='h6'>Base Price:</Typography>
+			<Typography variant='subtitle1'>₹{auction.basePrice}</Typography>
+			<Typography variant='h6'>Current Price:</Typography>
+			<Typography variant='subtitle1'>₹{auction.currentBid}</Typography>
+			<Typography variant='h6'>Time remaining:</Typography>
+			<Typography variant='subtitle1'>{ timerString }</Typography>
+		</div>
 		<Button sx={{mt: 4}} onClick={ handleEnd } variant='outlined'>End Auction</Button>
 	</div>);
 }

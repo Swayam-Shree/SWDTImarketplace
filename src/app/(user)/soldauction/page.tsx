@@ -40,7 +40,7 @@ export default function BoughtAuction() {
 
 	if (user) {
 		return (<div className='flex flex-col items-center'>
-			<Typography className='text-center' variant='h2'>Bought Auctions</Typography>
+			<Typography className='text-center' variant='h2'>Sold Auctions</Typography>
 			<div className='grid md:grid-cols-2 lg:grid-cols-3'>
 				{ auctionsJsx }
 			</div>

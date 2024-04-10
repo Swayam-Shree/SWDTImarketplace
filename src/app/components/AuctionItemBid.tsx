@@ -5,6 +5,8 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 
+import Carousel from 'react-material-ui-carousel';
+
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
@@ -76,6 +78,8 @@ export default function({ auction }: { auction: Auction }) {
 						setBidValueHelperText('insufficient balance: ₹' + userGlobals.userData.balance);
 					} else if (code === 0) {
 						setBidValueHelperText('Bid amount changed, please try again');
+					} else if (code === 2) {
+						setBidValueHelperText('Auction ended, please refresh');
 					}
 				}
 			});
@@ -83,7 +87,14 @@ export default function({ auction }: { auction: Auction }) {
 	}
 
 	let content = (<>
-			<Image src='/logo.png' alt='Item Image' width='256' height='256' />
+			<Carousel className='min-w-[256px]'>
+				{
+					auction.imageURLs.map((url, index) => (
+						<Image key={index} src={url} alt='Item Image' width='256' height='256' />
+					))
+				}
+			</Carousel>
+			
 			<Typography sx={{mt: 4}} variant='h3'>{auction.itemName}</Typography>
 			<div className='flex flex-col items-left mt-[1em] min-w-[250px]'>
 				<Typography variant='h6'>Description:</Typography>

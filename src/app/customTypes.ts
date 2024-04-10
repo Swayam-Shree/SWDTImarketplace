@@ -12,7 +12,9 @@ export interface Auction {
 	active: boolean,
 	currentBid: number,
 	highestBidderId: string,
-	qrToken: string
+	qrToken: string,
+	imageURLs: string[],
+	imageRefs: string[]
 }
 
 export interface User {

@@ -1,6 +1,7 @@
 "use client"
 
-import { auth } from '../../firebase';
+import { auth, storage } from '../../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 import { useRouter } from 'next/navigation';
@@ -14,6 +15,9 @@ import MenuItem from '@mui/material/MenuItem';
 import InputAdornment from '@mui/material/InputAdornment';
 import Snackbar from '@mui/material/Snackbar';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import CircularProgress from '@mui/material/CircularProgress';
+
+import Carousel from 'react-material-ui-carousel';
 
 import { socket } from '../../socket';
 
@@ -34,13 +38,34 @@ export default function NewAuction() {
 	const [snackbarOpen, setSnackbarOpen] = useState(false);
 	const [snackbarMessage, setSnackbarMessage] = useState("");
 
-	function handleCreateAuction() {
+	const [imageFiles, setImageFiles] = useState(null as FileList | null);
+
+	const [uploading, setUploading] = useState(false);
+
+	async function handleCreateAuction() {
 		setItemNameError(!itemName);
 		setItemDescriptionError(!itemDescription);
 		setBasePriceError(!basePrice);
 
-		if (itemName && itemDescription && basePrice) {
-			console.log("creating auction on browser");
+		if (!imageFiles) {
+			setSnackbarOpen(true);
+			setSnackbarMessage("Please upload images and enter all fields.");
+		}
+
+		if (itemName && itemDescription && basePrice && imageFiles) {
+			setUploading(true);
+			
+			let imageURLs = [], imageRefs = [];
+			for (let i = 0; i < imageFiles.length; ++i) {
+				const file = imageFiles[i];
+				const reff = String(Date.now()) + file.name;
+				const storageRef = ref(storage, reff);
+
+				await uploadBytes(storageRef, file);
+				
+				imageURLs.push(await getDownloadURL(storageRef));
+				imageRefs.push(reff);
+			}
 
 			socket.emit('createAuction', {
 				ownerId: user?.uid, 
@@ -48,12 +73,16 @@ export default function NewAuction() {
 				itemDescription,
 				basePrice: parseInt(basePrice),
 				duration: parseInt(duration) * 3600 * 1000, // converting hours to milliseconds
+				imageURLs: imageURLs,
+				imageRefs: imageRefs,
 			}, (success: boolean) => {
+				setUploading(false);
 				if (success) {
 					setItemName('');
 					setItemDescription('');
 					setBasePrice('');
 					setDuration(durationDefaultVal);
+					setImageFiles(null);
 
 					setSnackbarOpen(true);
 					setSnackbarMessage("Auction created successfully.");
@@ -102,12 +131,26 @@ export default function NewAuction() {
 				}
 			</TextField>
 
-			{/* <Button sx={{mt: 2}} component="label" variant="outlined" startIcon={<CloudUploadIcon />}>
-				Upload Primary Image
-					<input onChange={(e) => { console.log(e?.target?.files) }} type="file" hidden multiple />
-			</Button> */}
+			{ 
+				imageFiles && <Carousel className='min-w-[256px] my-[4em]'>
+					{
+						imageFiles && Array.from(imageFiles).map((file, index) => (
+							<img key={index} src={URL.createObjectURL(file)} />
+						))
+					}
+				</Carousel>
+			}
 
-			<Button sx={{mt: 6}} onClick={ handleCreateAuction } variant='contained'>Create Auction</Button>
+			<Button sx={{mt: 2}} component="label" variant="outlined" startIcon={<CloudUploadIcon />}>
+				Upload Images
+					<input onChange={ (e) => setImageFiles(e?.target?.files) } type="file" hidden multiple />
+			</Button>
+
+			{
+				uploading && <CircularProgress sx={{mt: 4}} />
+			}
+
+			<Button sx={{mt: 6}} onClick={ handleCreateAuction } variant='contained' disabled={uploading}>Create Auction</Button>
 
 			<Snackbar
 				open={snackbarOpen}

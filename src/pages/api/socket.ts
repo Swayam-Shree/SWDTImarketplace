@@ -86,6 +86,11 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 				await bidSession.withTransaction(async () => {
 					let user = await usersCollection.findOne({ ownerId: uid });
 					let auction = await auctionsCollection.findOne({ _id: getObjectId(auctionId) });
+
+					if (!auction?.active) {
+						success(false, 2); // auction ended
+						return;
+					}
 					
 					if (auction?.currentBid === currentExpectedAmount) {
 						if (auction?.currentBid === 0 && bidAmount < auction?.basePrice) return;

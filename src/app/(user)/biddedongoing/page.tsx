@@ -75,7 +75,7 @@ export default function BrowseAuction() {
 
 	if (user) {
 		return (<div className='flex flex-col items-center m-[2em]'>
-			<Typography className='text-center' variant='h2'>Browse Auctions</Typography>
+			<Typography className='text-center' variant='h2'>Bidded Ongoing Auctions</Typography>
 			<div className='grid md:grid-cols-2 lg:grid-cols-3'>
 				{ auctionsJsx }
 			</div>
