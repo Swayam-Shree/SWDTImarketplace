@@ -26,7 +26,7 @@ export default function Login() {
 		return (<div>Error</div>);
 	} else {
 		return (<div className='flex flex-col items-center'>
-			<Button className='w-[200px]' sx={{mt: 30}} variant='contained' onClick={ handleGoogleSignIn }>Google Sign In</Button>
+			<Button className='w-[200px]' sx={{mt: 30}} variant='outlined' onClick={ handleGoogleSignIn }>Google Sign In</Button>
 		</div>);
 	}
 }

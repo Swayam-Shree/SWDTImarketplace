@@ -56,7 +56,7 @@ export default function Dashboard() {
 					<Button onClick={() => {router.push('./soldauction');}} variant='outlined'>Sold Auctions</Button>
 				</Badge>
 			</div>
-			<Button sx={{mt: 2}} variant='contained' onClick={ () => {auth.signOut();} }>Sign Out</Button>
+			<Button sx={{mt: 2}} variant='outlined' onClick={ () => {auth.signOut();} }>Sign Out</Button>
 		</div>);
 	} else if (authLoading) {
 		return (

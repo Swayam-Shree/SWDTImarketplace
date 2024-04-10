@@ -42,7 +42,7 @@ export default function({ auction }: { auction: Auction }) {
 			<Typography variant='h6'>Sold at:</Typography>
 			<Typography variant='subtitle1'>₹{auction.currentBid}</Typography>
 		</div>
-		<Button sx={{my: 1}} onClick={ handleGenerate } variant="contained">Generate QR</Button>
+		<Button sx={{my: 1}} onClick={ handleGenerate } variant="outlined">Generate QR</Button>
 		<div>
 			{
 				qrVal ? <QRCode size={256} value={qrVal} /> : null

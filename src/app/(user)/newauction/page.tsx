@@ -150,7 +150,7 @@ export default function NewAuction() {
 				uploading && <CircularProgress sx={{mt: 4}} />
 			}
 
-			<Button sx={{mt: 6}} onClick={ handleCreateAuction } variant='contained' disabled={uploading}>Create Auction</Button>
+			<Button sx={{mt: 6}} onClick={ handleCreateAuction } variant='outlined' disabled={uploading}>Create Auction</Button>
 
 			<Snackbar
 				open={snackbarOpen}
