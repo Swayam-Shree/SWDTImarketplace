@@ -71,6 +71,10 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 						soldAuctions.push(auction);
 					}
 				}
+				
+				auctionsCollection.deleteMany({ _id: { $in: unsoldAuctionsIds } });
+
+				socket.emit("sendAuctionStats", wonAuctions, soldAuctions);
 
 				await usersCollection.updateOne({ ownerId: uid }, {
 					$pull: { biddings: { auctionId: { $in: lostAuctions.map(auction => String(auction._id)) } } } as PullOperator<Document>,
