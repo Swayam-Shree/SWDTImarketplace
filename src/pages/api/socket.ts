@@ -4,10 +4,13 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { bidSession, auctionsCollection, usersCollection, getObjectId } from '@/app/server/mongo';
 
 import { ObjectId } from 'mongodb';
+import type { PullOperator } from 'mongodb';
+
+import type { Socket } from 'socket.io';
 
 const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 	// @ts-expect-error
-	if (!res.socket.server.io) {
+	if (!res?.socket?.server.io) {
 		// @ts-expect-error
 		const io = new Server(res.socket.server);
 		// @ts-expect-error
@@ -69,17 +72,10 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 					}
 				}
 
-				auctionsCollection.deleteMany({ _id: { $in: unsoldAuctionsIds } });
-
-				socket.emit("sendAuctionStats", wonAuctions, soldAuctions);
-				
 				await usersCollection.updateOne({ ownerId: uid }, {
-					// @ts-expect-error
-					$pull: { biddings: { auctionId: { $in: lostAuctions.map(auction => String(auction._id)) } } },
+					$pull: { biddings: { auctionId: { $in: lostAuctions.map(auction => String(auction._id)) } } } as PullOperator<Document>,
 					$inc: { balance: returnedAmount, lockedBalance: -returnedAmount }
 				});
-				
-				socket.emit('updateUserData', await usersCollection.findOne({ ownerId: uid }));
 			});
 
 			socket.on('bid', async (uid, auctionId, bidAmount, currentExpectedAmount, success) => {
@@ -124,8 +120,7 @@ const SocketHandler = (req: NextApiRequest, res: NextApiResponse) => {
 
 								if (totalBidAmount <= user?.balance) {
 									await usersCollection.updateOne({ ownerId: uid }, { 
-										// @ts-expect-error
-										$push: { biddings: { auctionId: auctionId, bidAmount: totalBidAmount } },
+										$push: { biddings: { auctionId: auctionId, bidAmount: totalBidAmount } } as PullOperator<Document>,
 										$inc: { balance: -totalBidAmount, lockedBalance: totalBidAmount }
 									});
 								} else {
