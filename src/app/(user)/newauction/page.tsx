@@ -160,7 +160,12 @@ export default function NewAuction() {
 			/>
 		</div>);
 	} else if (authLoading) {
-		return (<div>Loading...</div>);
+		return (
+			<div>
+				Loading...
+				<CircularProgress />
+			</div>
+		);
 	} else if (authError) {
 		return (<div>Error</div>);
 	} else {

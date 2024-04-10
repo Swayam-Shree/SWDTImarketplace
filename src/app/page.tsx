@@ -2,11 +2,12 @@
 
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
+
 import { auth } from './firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 import { useRouter } from 'next/navigation';
-
 
 export default function Landing() {
 	const router = useRouter();
@@ -15,7 +16,12 @@ export default function Landing() {
 	if (user) {
 		router.push('/dashboard');
 	} else if (authLoading) {
-		return (<div>Loading...</div>);
+		return (
+			<div>
+				Loading...
+				<CircularProgress />
+			</div>
+		);
 	} else if (authError) {
 		return (<div>Error</div>);
 	} else {

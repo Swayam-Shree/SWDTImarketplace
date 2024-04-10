@@ -11,6 +11,7 @@ import { socket } from '../../socket';
 import type { Auction } from '@/app/customTypes';
 
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import AuctionItemBid from '@/app/components/AuctionItemBid';
 
@@ -81,7 +82,12 @@ export default function BrowseAuction() {
 			</div>
 		</div>);
 	} else if (authLoading) {
-		return (<div>Loading...</div>);
+		return (
+			<div>
+				Loading...
+				<CircularProgress />
+			</div>
+		);
 	} else if (authError) {
 		return (<div>Error</div>);
 	} else {

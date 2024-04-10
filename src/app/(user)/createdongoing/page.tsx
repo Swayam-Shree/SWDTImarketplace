@@ -12,6 +12,7 @@ import { socket } from '../../socket';
 import type { Auction } from '@/app/customTypes';
 
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import AuctionItemDisplay from '@/app/components/AuctionItemDisplay';
 
@@ -47,7 +48,12 @@ export default function CreatedOngoing() {
 			});
 		}
 	} else {
-		auctionsJsx = <div>Loading...</div>;
+		auctionsJsx = (
+			<div>
+				Loading...
+				<CircularProgress />
+			</div>
+		);
 	}
 
 	if (user) {
@@ -58,7 +64,12 @@ export default function CreatedOngoing() {
 			</div>
 		</div>);
 	} else if (authLoading) {
-		return (<div>Loading...</div>);
+		return (
+			<div>
+				Loading...
+				<CircularProgress />
+			</div>
+		);
 	} else if (authError) {
 		return (<div>Error</div>);
 	} else {

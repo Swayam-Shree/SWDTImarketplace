@@ -9,6 +9,7 @@ import Image from 'next/image';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Badge from '@mui/material/Badge';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import { useEffect, useState } from 'react';
 
@@ -58,7 +59,12 @@ export default function Dashboard() {
 			<Button sx={{mt: 2}} variant='contained' onClick={ () => {auth.signOut();} }>Sign Out</Button>
 		</div>);
 	} else if (authLoading) {
-		return (<div>Loading...</div>);
+		return (
+			<div>
+				Loading...
+				<CircularProgress />
+			</div>
+		);
 	} else if (authError) {
 		return (<div>Error</div>);
 	} else {

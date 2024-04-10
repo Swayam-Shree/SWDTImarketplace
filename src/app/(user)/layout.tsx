@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import { socket } from '../socket';
 
@@ -25,7 +26,10 @@ export default function Layout({
 	// TODO: handle socket not connected on dashboard load more elegantly
 	if (!socket) {
 		setTimeout(() => {router.push('/');}, 100);
-		return (<div>Connecting to server...</div>);
+		return (<div>
+			Connecting to server...
+			<CircularProgress />
+		</div>);
 	}
 
 	const [user, authLoading, authError] = useAuthState(auth);
@@ -51,8 +55,8 @@ export default function Layout({
 						</div>
 					: 
 						<div className='flex justify-between'>
-							<Typography sx={{mt: 2, mx: 4}} variant='subtitle1'>Balance: Loading...</Typography>	
-							<Typography sx={{mt: 2, mx: 4}} variant='subtitle1'>Locked Balance: Loading...</Typography>
+							<Typography sx={{mt: 2, mx: 4}} variant='subtitle1'>Balance: <CircularProgress /> </Typography>	
+							<Typography sx={{mt: 2, mx: 4}} variant='subtitle1'>Locked Balance: <CircularProgress /> </Typography>
 						</div>
 				}
 				<Button sx={{m: 2}} variant='outlined' onClick={ () => router.push('/dashboard') }>Dashboard</Button>
